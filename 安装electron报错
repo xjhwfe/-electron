@@ -1,0 +1,27 @@
+安装electron：
+首先node版本不能太低，都需要全局安装，8.11.1的版本安装electron-builder报错。
+一直卡在install.js问题：
+  修改~/.npmrc 文件，该文件可以在：C:\Users\Administrator 目录下面找到,如果是Mac 直接open，加入如下代码：
+  registry=https://registry.npm.taobao.org
+  electron_mirror="https://npm.taobao.org/mirrors/electron/
+安装electron过慢问题：
+  Windows：$LOCALAPPDATA/electron/Cache或~/AppData/Local/electron/Cache/
+  Mac：~/Library/Caches/electron/
+打包electron exe 文件：package json 配置：
+  {
+    "name": "",
+    "version": "0.1.0",
+    "main": "index.js",
+    "author": "",
+    "dependencies": {},
+    "devDependencies": {
+      "electron": "^6.0.12",
+      "electron-packager": "^14.0.1"
+    },
+    "scripts": {
+      "start": "electron .",
+      "build": "electron-builder --win --x64"
+    }
+  }
+  npm run biuld 出现sh: electron-builder: command not found报错；
+  全局安装electron-builder就好了
