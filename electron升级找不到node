@@ -1,0 +1,4 @@
+        nodeIntegration: true, 
+        webSecurity: false,
+        contextIsolation: false,
+        enableRemoteModule: true
