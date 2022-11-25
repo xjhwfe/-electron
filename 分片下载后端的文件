@@ -1,0 +1,71 @@
+exportSlidesRequest(id,want_db,filename){
+            return new Promise((r)=>{
+              axios({
+                  headers: {'Content-Type': ' application/x-www-form-urlencoded'},
+                  method: 'post',
+                  url: `/aipath/api/files/download`,
+                  data: qs.stringify({caseid:id,want_db,companyid:userInfo().company}),
+                  responseType:'blob',
+                  getResponse:true
+              })
+              .then(async (res)=> {
+                  let contentType = res.headers['content-type'];
+                  if(contentType==='application/json') r(0)
+                  else{
+
+                    let blob = new Blob([res.data]);
+                    let fileSize = blob.size;
+                    filename = filename?filename:res.headers['content-disposition'].split('=')[1];
+                    let chunkSize = 20*1024*1024;
+                    var writeStream1 = new fs.createWriteStream(this.folder+'\\'+filename);
+                    console.log('下载完成:'+filename)
+                    writeStream1
+                      .on('error', (err) => {
+                        console.log('error')
+                        r('error')
+                      })
+                      .on('finish',async () => {
+                        console.log('下载完成:'+filename)
+                        r('done')
+                      });
+                    for (let start = 0; start < fileSize; start += chunkSize) {
+                      let chunk = blob.slice(start, start + chunkSize);
+                      if((start + chunkSize)>fileSize){
+                        chunk = blob.slice(start, fileSize + 1);
+                      }
+                      let curBuff = await getBuffer(chunk);
+                      var passThrough1 = new stream.PassThrough().end(toBuffer(curBuff)); 
+                      if((start + chunkSize)>fileSize){
+                        passThrough1.pipe(writeStream1)
+                      }
+                      else{
+                        passThrough1.pipe(writeStream1,{end:false})
+                      }
+                    }
+                    
+                    function toBuffer(ab) {
+                        var buf = new Buffer(ab.byteLength);
+                        var view = new Uint8Array(ab);
+                        for (var i = 0; i < buf.length; ++i) {
+                            buf[i] = view[i];
+                        }
+                        return buf;
+                    }
+                    function getBuffer(chunk){
+                      return new Promise(r=>{
+                        let reader  = new FileReader();
+                        reader.readAsArrayBuffer(chunk);
+                        reader.onload = (e)=>{
+                          r(e.target.result)
+                        }
+                      })
+                    }
+                    
+                  }
+              })
+              .catch((e)=> {
+                r('error')
+              });
+
+            })            
+          },
