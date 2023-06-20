@@ -1,0 +1,3 @@
+给pdf添加背景的命令：$ pdftk yourfile.pdf background background.pdf output yourfile_b.pdf 
+软件：pdftk_server-2.02-win-setup.exe
+要点：一个背景pdf和内容pdf拼接而成
